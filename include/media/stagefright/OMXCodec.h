@@ -191,6 +191,7 @@ private:
         size_t mSize;
         void *mData;
         MediaBuffer *mMediaBuffer;
+        bool mOutputCropChanged;
     };
 
     struct CodecSpecificData {
@@ -376,6 +377,10 @@ private:
     status_t applyRotation();
     status_t waitForBufferFilled_l();
 
+#ifdef QCOM_HARDWARE
+    status_t resumeLocked(bool drainInputBuf);
+#endif
+
     int64_t getDecodingTimeUs();
 
     status_t parseAVCCodecSpecificData(
@@ -389,8 +394,9 @@ private:
 
 #ifdef QCOM_HARDWARE
     int32_t mNumBFrames;
-    bool mInSmoothStreamingMode;
 #endif
+    bool mInSmoothStreamingMode;
+    bool mOutputCropChanged;
 };
 
 struct CodecCapabilities {
