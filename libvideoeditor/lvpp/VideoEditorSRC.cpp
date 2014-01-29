@@ -284,7 +284,7 @@ status_t VideoEditorSRC::getNextBuffer(AudioBufferProvider::Buffer *pBuffer, int
 
 
 void VideoEditorSRC::releaseBuffer(AudioBufferProvider::Buffer *pBuffer) {
-    ALOGV("releaseBuffer: %p", pBuffer);
+    ALOGV("releaseBuffer: %p", pBuffers);
     free(pBuffer->raw);
     pBuffer->raw = NULL;
     pBuffer->frameCount = 0;

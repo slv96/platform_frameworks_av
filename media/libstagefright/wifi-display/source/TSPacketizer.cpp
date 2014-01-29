@@ -565,8 +565,9 @@ status_t TSPacketizer::packetize(
             }
         }
 
+        // size_t numPaddingBytes = sizeAvailableForPayload - numBytesOfPayload;
         ALOGV("packet 1 contains %zd padding bytes and %zd bytes of payload",
-              sizeAvailableForPayload - numBytesOfPayload, numBytesOfPayload);
+              numPaddingBytes, numBytesOfPayload);
 
         size_t numBytesOfPayloadRemaining = accessUnit->size() - numBytesOfPayload;
 

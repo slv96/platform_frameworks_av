@@ -56,47 +56,42 @@ MtpStringBuffer::~MtpStringBuffer() {
 }
 
 void MtpStringBuffer::set(const char* src) {
+    int length = strlen(src);
+    if (length >= sizeof(mBuffer))
+        length = sizeof(mBuffer) - 1;
+    memcpy(mBuffer, src, length);
+
     // count the characters
     int count = 0;
     char ch;
-    char* dest = (char*)mBuffer;
-
-    while ((ch = *src++) != 0 && count < MTP_STRING_MAX_CHARACTER_NUMBER) {
+    while ((ch = *src++) != 0) {
         if ((ch & 0x80) == 0) {
             // single byte character
-            *dest++ = ch;
         } else if ((ch & 0xE0) == 0xC0) {
             // two byte character
-            char ch1 = *src++;
-            if (! ch1) {
+            if (! *src++) {
                 // last character was truncated, so ignore last byte
+                length--;
                 break;
             }
-
-            *dest++ = ch;
-            *dest++ = ch1;
         } else if ((ch & 0xF0) == 0xE0) {
             // 3 byte char
-            char ch1 = *src++;
-            if (! ch1) {
+            if (! *src++) {
                 // last character was truncated, so ignore last byte
+                length--;
                 break;
             }
-            char ch2 = *src++;
-            if (! ch2) {
-                // last character was truncated, so ignore last byte
+            if (! *src++) {
+                // last character was truncated, so ignore last two bytes
+                length -= 2;
                 break;
             }
-
-            *dest++ = ch;
-            *dest++ = ch1;
-            *dest++ = ch2;
         }
         count++;
     }
 
-    *dest++ = 0;
-    mByteCount = dest - (char*)mBuffer;
+    mByteCount = length + 1;
+    mBuffer[length] = 0;
     mCharCount = count;
 }
 
@@ -105,7 +100,7 @@ void MtpStringBuffer::set(const uint16_t* src) {
     uint16_t ch;
     uint8_t* dest = mBuffer;
 
-    while ((ch = *src++) != 0 && count < MTP_STRING_MAX_CHARACTER_NUMBER) {
+    while ((ch = *src++) != 0 && count < 255) {
         if (ch >= 0x0800) {
             *dest++ = (uint8_t)(0xE0 | (ch >> 12));
             *dest++ = (uint8_t)(0x80 | ((ch >> 6) & 0x3F));
